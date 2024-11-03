@@ -26,23 +26,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       actions: [
         LayoutBuilder(
           builder: (context, constraints) {
-            // Adjust the button visibility based on available width
             if (constraints.maxWidth > 800) {
               return Row(
                 children: _buildActionButtons(),
               );
             } else if (constraints.maxWidth > 600) {
-              // Hide 'About'
               return Row(
                 children: _buildActionButtons(visibleButtons: 4),
               );
             } else if (constraints.maxWidth > 400) {
-              // Hide 'Contact' and WhatsApp button
               return Row(
                 children: _buildActionButtons(visibleButtons: 3),
               );
             } else {
-              // Show only 'Home' and 'News'
               return Row(
                 children: _buildActionButtons(visibleButtons: 2),
               );
@@ -70,13 +66,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       _createTextButton('News', () {
         // Handle About action
       }),
-      _createTextButton('CAbout', () {
+      _createTextButton('About', () {
         // Handle Contact action
       }),
-      _createWhatsAppButton('+1234567891'), // Include WhatsApp button here
+      WhatsAppButton('+1234567891'), // WhatsApp button implementation
     ];
 
-    // Return only the visible buttons based on the parameter
     return buttons.take(visibleButtons).toList();
   }
 
@@ -93,44 +88,77 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     );
   }
 
-  Widget _createWhatsAppButton(String whatsAppNumber) {
-    return OutlinedButton(
-      onPressed: () async {
-        String phoneNumber = whatsAppNumber; // Replace with the actual number
-        final whatsappUrl = 'https://wa.me/$phoneNumber';
-        try {
-          if (await canLaunch(whatsappUrl)) {
-            await launch(whatsappUrl);
-          } else {
-            print('Could not launch $whatsappUrl');
-          }
-        } catch (e) {
-          print('Error launching WhatsApp: $e');
-        }
-      },
-      style: OutlinedButton.styleFrom(
-        side: const BorderSide(color: Color.fromARGB(255, 10, 140, 64)),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8.0),
-        ),
-      ),
-      child: Row(
-        children: [
-          const Icon(Icons.call),
-          const SizedBox(width: 4),
-          Text(
-            '+123456748941', // Display the WhatsApp number
-            style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-          ),
-        ],
-      ),
-    );
-  }
-
   TextStyle setTextStyleColor(Color color) {
     return TextStyle(color: color);
   }
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class WhatsAppButton extends StatefulWidget {
+  final String whatsAppNumber;
+
+  const WhatsAppButton(this.whatsAppNumber);
+
+  @override
+  _WhatsAppButtonState createState() => _WhatsAppButtonState();
+}
+
+class _WhatsAppButtonState extends State<WhatsAppButton> {
+  bool _isHovered = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: OutlinedButton(
+        onPressed: () async {
+          String phoneNumber = widget.whatsAppNumber;
+          final whatsappUrl = 'https://wa.me/$phoneNumber';
+          try {
+            if (await canLaunch(whatsappUrl)) {
+              await launch(whatsappUrl);
+            } else {
+              print('Could not launch $whatsappUrl');
+            }
+          } catch (e) {
+            print('Error launching WhatsApp: $e');
+          }
+        },
+        style: OutlinedButton.styleFrom(
+          side: const BorderSide(color: Color.fromARGB(255, 10, 140, 64)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          backgroundColor: _isHovered
+              ? Color.fromARGB(255, 12, 196, 110)
+              : Colors.transparent,
+        ),
+        child: const Row(
+          children: [
+            Icon(Icons.call),
+            SizedBox(width: 4),
+            Text(
+              '+123456748941', // Display the WhatsApp number
+              style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+void main() {
+  runApp(MaterialApp(
+    title: 'Custom App Bar Example',
+    home: Scaffold(
+      appBar: CustomAppBar(title: 'My Custom AppBar'),
+      body: Center(
+        child: Text('Content goes here'),
+      ),
+    ),
+  ));
 }
