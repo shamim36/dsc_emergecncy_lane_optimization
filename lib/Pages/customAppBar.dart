@@ -15,10 +15,20 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Expanded(
-            child: Text(
-              title,
-              style: const TextStyle(fontWeight: FontWeight.bold),
-              overflow: TextOverflow.ellipsis,
+            child: GestureDetector(
+              onTap: () {
+                // Handle title button action
+                print('Title button pressed');
+                // Add your navigation or action logic here
+              },
+              child: Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black, // Set text color here
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
         ],
@@ -69,7 +79,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       _createTextButton('About', () {
         // Handle Contact action
       }),
-      WhatsAppButton('+1234567891'), // WhatsApp button implementation
+      const WhatsAppButton('+1234567891'), // WhatsApp button implementation
     ];
 
     return buttons.take(visibleButtons).toList();
@@ -152,13 +162,15 @@ class _WhatsAppButtonState extends State<WhatsAppButton> {
 }
 
 void main() {
-  runApp(MaterialApp(
-    title: 'Custom App Bar Example',
-    home: Scaffold(
-      appBar: CustomAppBar(title: 'My Custom AppBar'),
-      body: Center(
-        child: Text('Content goes here'),
+  runApp(
+    MaterialApp(
+      title: 'Custom App Bar Example',
+      home: Scaffold(
+        appBar: CustomAppBar(title: 'My Custom AppBar'),
+        body: Center(
+          child: Text('Content goes here'),
+        ),
       ),
     ),
-  ));
+  );
 }
