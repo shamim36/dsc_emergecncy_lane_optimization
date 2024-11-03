@@ -19,13 +19,12 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               onTap: () {
                 // Handle title button action
                 print('Title button pressed');
-                // Add your navigation or action logic here
               },
               child: Text(
                 title,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.black, // Set text color here
+                  color: Colors.black,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -33,38 +32,11 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ],
       ),
-      actions: [
-        LayoutBuilder(
-          builder: (context, constraints) {
-            if (constraints.maxWidth > 800) {
-              return Row(
-                children: _buildActionButtons(),
-              );
-            } else if (constraints.maxWidth > 600) {
-              return Row(
-                children: _buildActionButtons(visibleButtons: 5),
-              );
-            } else if (constraints.maxWidth > 400) {
-              return Row(
-                children: _buildActionButtons(visibleButtons: 4),
-              );
-            } else if (constraints.maxWidth > 300) {
-              return Row(
-                children: _buildActionButtons(visibleButtons: 3),
-              );
-            } else {
-              return Row(
-                children: _buildActionButtons(visibleButtons: 2),
-              );
-            }
-          },
-        ),
-        _profileButton(), // Profile button is always visible
-      ],
+      actions: _buildActionButtons(context),
     );
   }
 
-  List<Widget> _buildActionButtons({int visibleButtons = 5}) {
+  List<Widget> _buildActionButtons(BuildContext context) {
     final buttons = <Widget>[
       _createTextButton('Home', () {
         print('Clicked Home');
@@ -78,8 +50,22 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       _createTextButton('About', () {
         print('Clicked About');
       }),
-      const WhatsAppButton('+1234567891'), // WhatsApp button implementation
+      const WhatsAppButton('+1234567891'),
+      _profileButton(),
     ];
+
+    // Get the available width
+    final width = MediaQuery.of(context).size.width;
+
+    // Determine how many buttons to show
+    int visibleButtons = 6; // Default to all buttons
+    if (width <= 400) {
+      visibleButtons = 1; // Show only the WhatsApp button
+    } else if (width <= 600) {
+      visibleButtons = 3; // Show the first three buttons and WhatsApp
+    } else if (width <= 800) {
+      visibleButtons = 5; // Show all buttons except profile
+    }
 
     return buttons.take(visibleButtons).toList();
   }
@@ -88,7 +74,6 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return IconButton(
       icon: const Icon(Icons.person, color: Colors.black),
       onPressed: () {
-        // Handle profile action
         print('Clicked Profile');
       },
     );
@@ -101,70 +86,49 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         onPressed: onPressed,
         child: Text(
           title,
-          style: setTextStyleColor(const Color.fromARGB(255, 0, 0, 0)),
+          style: const TextStyle(color: Colors.black),
         ),
       ),
     );
-  }
-
-  TextStyle setTextStyleColor(Color color) {
-    return TextStyle(color: color);
   }
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
-class WhatsAppButton extends StatefulWidget {
+class WhatsAppButton extends StatelessWidget {
   final String whatsAppNumber;
 
   const WhatsAppButton(this.whatsAppNumber);
 
   @override
-  _WhatsAppButtonState createState() => _WhatsAppButtonState();
-}
-
-class _WhatsAppButtonState extends State<WhatsAppButton> {
-  bool _isHovered = false;
-
-  @override
   Widget build(BuildContext context) {
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: OutlinedButton(
-        onPressed: () async {
-          String phoneNumber = widget.whatsAppNumber;
-          final whatsappUrl = 'https://wa.me/$phoneNumber';
-          try {
-            if (await canLaunch(whatsappUrl)) {
-              await launch(whatsappUrl);
-            } else {
-              print('Could not launch $whatsappUrl');
-            }
-          } catch (e) {
-            print('Error launching WhatsApp: $e');
+    return OutlinedButton(
+      onPressed: () async {
+        String phoneNumber = whatsAppNumber;
+        final whatsappUrl = 'https://wa.me/$phoneNumber';
+        try {
+          if (await canLaunch(whatsappUrl)) {
+            await launch(whatsappUrl);
+          } else {
+            print('Could not launch $whatsappUrl');
           }
-        },
-        style: OutlinedButton.styleFrom(
-          side: const BorderSide(color: Color.fromARGB(255, 10, 140, 64)),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8.0),
-          ),
-          backgroundColor: _isHovered
-              ? Color.fromARGB(255, 12, 196, 110)
-              : Colors.transparent,
+        } catch (e) {
+          print('Error launching WhatsApp: $e');
+        }
+      },
+      style: OutlinedButton.styleFrom(
+        side: const BorderSide(color: Color.fromARGB(255, 10, 140, 64)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8.0),
         ),
-        child: const Row(
-          children: [
-            Icon(Icons.call),
-            SizedBox(width: 4),
-            Text(
-              '+123456748941', // Display the WhatsApp number
-              style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
-            ),
-          ],
-        ),
+      ),
+      child: Row(
+        children: const [
+          Icon(Icons.call),
+          SizedBox(width: 4),
+          Text('+123456748941'),
+        ],
       ),
     );
   }
@@ -182,5 +146,4 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
 
