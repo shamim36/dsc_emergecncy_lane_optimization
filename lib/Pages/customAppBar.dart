@@ -42,9 +42,13 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               );
             } else if (constraints.maxWidth > 600) {
               return Row(
-                children: _buildActionButtons(visibleButtons: 4),
+                children: _buildActionButtons(visibleButtons: 5),
               );
             } else if (constraints.maxWidth > 400) {
+              return Row(
+                children: _buildActionButtons(visibleButtons: 4),
+              );
+            } else if (constraints.maxWidth > 300) {
               return Row(
                 children: _buildActionButtons(visibleButtons: 3),
               );
@@ -55,13 +59,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             }
           },
         ),
-        IconButton(
-          icon: const Icon(Icons.person, color: Colors.black),
-          onPressed: () {
-            // Handle profile action
-            print('Clicked Profile');
-          },
-        ),
+        _profileButton(), // Profile button is always visible
       ],
     );
   }
@@ -69,25 +67,31 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   List<Widget> _buildActionButtons({int visibleButtons = 5}) {
     final buttons = <Widget>[
       _createTextButton('Home', () {
-        // Handle Home action
         print('Clicked Home');
       }),
       _createTextButton('E.num', () {
-        // Handle News action
         print('Clicked E.num');
       }),
       _createTextButton('News', () {
-        // Handle About action
         print('Clicked News');
       }),
       _createTextButton('About', () {
-        // Handle Contact action
         print('Clicked About');
       }),
       const WhatsAppButton('+1234567891'), // WhatsApp button implementation
     ];
 
     return buttons.take(visibleButtons).toList();
+  }
+
+  IconButton _profileButton() {
+    return IconButton(
+      icon: const Icon(Icons.person, color: Colors.black),
+      onPressed: () {
+        // Handle profile action
+        print('Clicked Profile');
+      },
+    );
   }
 
   Widget _createTextButton(String title, VoidCallback onPressed) {
@@ -165,3 +169,18 @@ class _WhatsAppButtonState extends State<WhatsAppButton> {
     );
   }
 }
+
+// Main app widget for testing the CustomAppBar
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: CustomAppBar(title: 'My Custom App Bar'),
+        body: Center(child: Text('Content goes here')),
+      ),
+    );
+  }
+}
+
+
