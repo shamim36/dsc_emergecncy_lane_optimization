@@ -59,6 +59,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           icon: const Icon(Icons.person, color: Colors.black),
           onPressed: () {
             // Handle profile action
+            print('Clicked Profile');
           },
         ),
       ],
@@ -69,15 +70,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     final buttons = <Widget>[
       _createTextButton('Home', () {
         // Handle Home action
+        print('Clicked Home');
       }),
       _createTextButton('E.num', () {
         // Handle News action
+        print('Clicked E.num');
       }),
       _createTextButton('News', () {
         // Handle About action
+        print('Clicked News');
       }),
       _createTextButton('About', () {
         // Handle Contact action
+        print('Clicked About');
       }),
       const WhatsAppButton('+1234567891'), // WhatsApp button implementation
     ];
@@ -159,18 +164,4 @@ class _WhatsAppButtonState extends State<WhatsAppButton> {
       ),
     );
   }
-}
-
-void main() {
-  runApp(
-    MaterialApp(
-      title: 'Custom App Bar Example',
-      home: Scaffold(
-        appBar: CustomAppBar(title: 'My Custom AppBar'),
-        body: Center(
-          child: Text('Content goes here'),
-        ),
-      ),
-    ),
-  );
 }
