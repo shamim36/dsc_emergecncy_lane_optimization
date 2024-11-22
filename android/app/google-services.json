@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "658427327658",
+    "project_id": "emergecncy-lane-optimization",
+    "storage_bucket": "emergecncy-lane-optimization.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:658427327658:android:6d81269d48ba47506a4cd3",
+        "android_client_info": {
+          "package_name": "com.example.dsc_emergecncy_lane_optimization"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDR_jxLhqAz4ulPpFk2eGOQllsnDbCulms"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

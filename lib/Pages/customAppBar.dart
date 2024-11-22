@@ -1,13 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+class CustomAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
 
   const CustomAppBar({Key? key, required this.title}) : super(key: key);
 
   @override
+  _CustomAppBarState createState() => _CustomAppBarState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
+}
+
+class _CustomAppBarState extends State<CustomAppBar> {
+  String _selectedButton = 'Home'; // Tracks the selected button title
+  bool _isProfileHovered = false; // Tracks hover state for profile button
+
+  @override
   Widget build(BuildContext context) {
+    final isMobile =
+        MediaQuery.of(context).size.width < 700; // Check for mobile screen size
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return AppBar(
       centerTitle: false,
       backgroundColor: Theme.of(context).colorScheme.inversePrimary,
@@ -21,9 +36,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 print('Title button pressed');
               },
               child: Text(
-                title,
+                widget.title,
                 style: const TextStyle(
-                  fontWeight: FontWeight.bold,
+                  fontWeight: FontWeight.w900,
                   color: Colors.black,
                 ),
                 overflow: TextOverflow.ellipsis,
@@ -32,68 +47,101 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ],
       ),
-      actions: _buildActionButtons(context),
+      actions: isMobile
+          ? []
+          : _buildActionButtons(
+              context), // Show buttons in AppBar only if not mobile
     );
   }
 
   List<Widget> _buildActionButtons(BuildContext context) {
     final buttons = <Widget>[
       _createTextButton('Home', () {
-        print('Clicked Home');
+        setState(() {
+          _selectedButton = 'Home';
+          print('Home Button Clicked');
+        });
       }),
-      _createTextButton('E.num', () {
-        print('Clicked E.num');
+      _createTextButton('''Emergency
+  Number''', () {
+        setState(() {
+          _selectedButton = '''Emergency
+  Number''';
+          print('Emergency Numbers Button Clicked');
+        });
       }),
       _createTextButton('News', () {
-        print('Clicked News');
+        setState(() {
+          _selectedButton = 'News';
+          print('News Button Clicked');
+        });
       }),
       _createTextButton('About', () {
-        print('Clicked About');
+        setState(() {
+          _selectedButton = 'About';
+          print('About Button Clicked');
+        });
       }),
-      const WhatsAppButton('+1234567891'), // Include WhatsApp button
+      const WhatsAppButton('+1234567891'),
       _profileButton(),
     ];
 
-    // Get the available width
-    final width = MediaQuery.of(context).size.width;
-
-    // Determine how many buttons to show based on screen width
-    int visibleButtons = 6; // Default to all buttons
-    if (width <= 400) {
-      visibleButtons = 1; // Show only the WhatsApp button
-    } else if (width <= 600) {
-      visibleButtons = 3; // Show first three buttons and WhatsApp
-    } else if (width <= 800) {
-      visibleButtons = 5; // Show all buttons except profile
-    }
-
-    return buttons.take(visibleButtons).toList();
+    return buttons;
   }
 
   IconButton _profileButton() {
     return IconButton(
-      icon: const Icon(Icons.person, color: Colors.black),
+      icon: MouseRegion(
+        onEnter: (_) => setState(() => _isProfileHovered = true),
+        onExit: (_) => setState(() => _isProfileHovered = false),
+        child: Container(
+          decoration: BoxDecoration(
+            color: _isProfileHovered || _selectedButton == 'Profile'
+                ? const Color(0xFFCCFFCC) // Light green when hovered or clicked
+                : Colors.transparent,
+            borderRadius: BorderRadius.circular(12), // Rounded corners
+          ),
+          child: const Icon(Icons.person_3_rounded, color: Colors.black),
+        ),
+      ),
       onPressed: () {
+        setState(() {
+          _selectedButton = 'Profile'; // Track profile button as selected
+        });
         print('Clicked Profile');
       },
     );
   }
 
   Widget _createTextButton(String title, VoidCallback onPressed) {
+    final isSelected =
+        _selectedButton == title; // Check if the button is selected
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4.0),
       child: TextButton(
         onPressed: onPressed,
-        child: Text(
-          title,
-          style: const TextStyle(color: Colors.black),
+        child: Container(
+          padding: const EdgeInsets.symmetric(
+              horizontal: 8, vertical: 4), // Add padding around the text
+          decoration: BoxDecoration(
+            color: isSelected
+                ? const Color(
+                    0xFFCCFFCC) // Light green background when selected
+                : Colors.transparent, // Transparent when not selected
+            borderRadius: BorderRadius.circular(12), // Rounded edges
+          ),
+          child: Text(
+            title,
+            style: const TextStyle(
+              color: Colors.black,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
         ),
       ),
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight);
 }
 
 class WhatsAppButton extends StatefulWidget {
@@ -142,7 +190,10 @@ class _WhatsAppButtonState extends State<WhatsAppButton> {
             SizedBox(width: 4),
             Text(
               '+123456748941', // Display the WhatsApp number
-              style: TextStyle(color: Color.fromARGB(255, 0, 0, 0)),
+              style: TextStyle(
+                color: Color.fromARGB(255, 0, 0, 0),
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ],
         ),
@@ -151,3 +202,51 @@ class _WhatsAppButtonState extends State<WhatsAppButton> {
   }
 }
 
+class CustomScaffold extends StatelessWidget {
+  final Widget body;
+
+  const CustomScaffold({Key? key, required this.body}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final isMobile = MediaQuery.of(context).size.width < 700;
+
+    return Scaffold(
+      appBar: CustomAppBar(title: 'My App'),
+      drawer: isMobile
+          ? Drawer(
+              child: ListView(
+                padding: EdgeInsets.zero,
+                children: [
+                  DrawerHeader(child: Text('Menu')),
+                  _createDrawerItem('Home', () {}),
+                  _createDrawerItem('''Emergency
+  Number''', () {}),
+                  _createDrawerItem('News', () {}),
+                  _createDrawerItem('About', () {}),
+                  const WhatsAppButton('+1234567891'),
+                  _profileButton(),
+                ],
+              ),
+            )
+          : null, // Only show the drawer on mobile
+      body: body,
+    );
+  }
+
+  ListTile _createDrawerItem(String title, VoidCallback onPressed) {
+    return ListTile(
+      title: Text(title),
+      onTap: onPressed,
+    );
+  }
+
+  IconButton _profileButton() {
+    return IconButton(
+      icon: const Icon(Icons.person, color: Colors.black),
+      onPressed: () {
+        print('Clicked Profile');
+      },
+    );
+  }
+}

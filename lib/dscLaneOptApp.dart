@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'Pages/customAppBar.dart';
+import 'Pages/customBody.dart';
 
 class DscLaneOptApp extends StatefulWidget {
   const DscLaneOptApp({super.key, required this.title});
@@ -17,9 +18,10 @@ class _DscLaneOptAppState extends State<DscLaneOptApp> {
       appBar: CustomAppBar(
           title: widget
               .title), // Using widget.title here to access the title from MyHomePage
-      body: Center(
-        child: Text('Welcome to ${widget.title}'),
-      ),
+      body: customBody(),
+      drawerEnableOpenDragGesture: true,
+      
     );
   }
 }
+
